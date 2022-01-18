@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package rpsls.game_service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/arttet/rock-paper-scissors-lizard-spock/pkg/game-service/v1;game_service";
+
+///////////////////////////////////////////////////////////////////////////////
+
+// clang-format off
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Rock Paper Scissors Lizard Spock";
+    version: "1.0";
+    license: {
+      name: "MIT";
+      url: "https://github.com/arttet/rock-paper-scissors-lizard-spock/blob/main/LICENSE";
+    };
+  };
+};
+// clang-format on
+
+////////////////////////////////////////////////////////////////////////////////
+
+service GameService {
+  // Get all the choices that are usable for the UI
+  rpc GetChoicesV1(google.protobuf.Empty) returns (GetChoicesV1Response) {
+    option (google.api.http) = {
+      get: "/choices"
+    };
+  }
+
+  // Get a randomly generated choice
+  rpc GetChoiceV1(google.protobuf.Empty) returns (GetChoiceV1Response) {
+    option (google.api.http) = {
+      get: "/choice"
+    };
+  }
+
+  // Play a round against a computer opponent
+  rpc PlayRoundV1(PlayRoundV1Request) returns (PlayRoundV1Response) {
+    option (google.api.http) = {
+      get: "/play"
+    };
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message GetChoicesV1Response {
+  repeated Choice choice = 1
+      [(validate.rules).repeated = { min_items: 5, max_items: 5 }];
+}
+
+message GetChoiceV1Response {
+  Choice choice = 1 [(validate.rules).message.required = true];
+}
+
+message PlayRoundV1Request {
+  int32 player = 1 [(validate.rules).int32 = { gte: 1, lte: 5 }];
+}
+
+message PlayRoundV1Response {
+  int32  player   = 1 [(validate.rules).int32 = { gte: 1, lte: 5 }];
+  int32  computer = 2 [(validate.rules).int32 = { gte: 1, lte: 5 }];
+  string results  = 3
+      [(validate.rules).string = { in: [ "win", "lose", "tie" ] }];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+message Choice {
+  int32  id   = 1 [(validate.rules).int32 = { gte: 1, lte: 5 }];
+  string name = 2 [(validate.rules).string = {
+    in: [ "rock", "paper", "scissors", "lizard", "spock" ]
+  }];
+}

@@ -1,0 +1,179 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Rock Paper Scissors Lizard Spock",
+    "version": "1.0",
+    "license": {
+      "name": "MIT",
+      "url": "https://github.com/arttet/rock-paper-scissors-lizard-spock/blob/main/LICENSE"
+    }
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/choice": {
+      "get": {
+        "summary": "Get a randomly generated choice",
+        "operationId": "GameService_GetChoiceV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetChoiceV1Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "GameService"
+        ]
+      }
+    },
+    "/choices": {
+      "get": {
+        "summary": "Get all the choices that are usable for the UI",
+        "operationId": "GameService_GetChoicesV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetChoicesV1Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "GameService"
+        ]
+      }
+    },
+    "/play": {
+      "get": {
+        "summary": "Play a round against a computer opponent",
+        "operationId": "GameService_PlayRoundV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1PlayRoundV1Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "player",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "GameService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Choice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetChoiceV1Response": {
+      "type": "object",
+      "properties": {
+        "choice": {
+          "$ref": "#/definitions/v1Choice"
+        }
+      }
+    },
+    "v1GetChoicesV1Response": {
+      "type": "object",
+      "properties": {
+        "choice": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Choice"
+          }
+        }
+      }
+    },
+    "v1PlayRoundV1Response": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "computer": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "results": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
