@@ -1,0 +1,53 @@
+project:
+  name: Game Service
+  debug: true
+  environment: development
+
+grpc:
+  host: localhost
+  port: 8082
+  maxConnectionIdle: 5m
+  timeout: 15s
+  maxConnectionAge: 5m
+
+rest:
+  host: localhost
+  port: 8080
+
+logger:
+  level: debug
+  encoding: json
+  outputPaths:
+    - stdout
+    - bin/logs.json
+  errorOutputPaths:
+    - stdout
+    - bin/errors.json
+  encoderConfig:
+    messageKey: message
+    levelKey: level
+    levelEncoder: lowercase
+    timeKey: time
+    timeEncoder: iso8601
+    callerKey: file
+    callerEncoder: file:line
+
+jaeger:
+  host: localhost
+  port: 6831
+  service: game-service
+
+metrics:
+  host: localhost
+  port: 9100
+  path: /metrics
+
+status:
+  host: localhost
+  port: 8000
+  livenessPath: /live
+  readinessPath: /ready
+  versionPath: /version
+  loggerPath: /log/level
+  swaggerDir: api/openapi-spec
+  swaggerPath: /swagger/

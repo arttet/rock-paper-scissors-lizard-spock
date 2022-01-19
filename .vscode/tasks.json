@@ -1,0 +1,66 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Docker: build",
+            "type": "shell",
+            "command": "bash",
+            "windows": {
+                "command": "C:\\Program Files\\Git\\bin\\bash.exe"
+            },
+            "args": [
+                "docker-compose",
+                "build",
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Docker: up",
+            "type": "shell",
+            "command": "bash",
+            "windows": {
+                "command": "C:\\Program Files\\Git\\bin\\bash.exe"
+            },
+            "args": [
+                "docker-compose",
+                "up",
+                "-d",
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Docker: down",
+            "type": "shell",
+            "command": "bash",
+            "windows": {
+                "command": "C:\\Program Files\\Git\\bin\\bash.exe"
+            },
+            "args": [
+                "docker-compose",
+                "down",
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Docker Volumes Remove",
+            "type": "shell",
+            "command": "bash",
+            "windows": {
+                "command": "C:\\Program Files\\Git\\bin\\bash.exe"
+            },
+            "args": [
+                "docker",
+                "volume",
+                "rm",
+                "$(docker volume ls -q)",
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+    ]
+}
