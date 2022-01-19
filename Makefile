@@ -39,6 +39,14 @@ fmt:
 cover:
 	go tool cover -html cover.out
 
+.PHONY: grpcui
+grpcui:
+	grpcui -plaintext 0.0.0.0:8082
+
+.PHONY: clean
+clean:
+	rm -rd ./bin/
+
 ################################################################################
 
 .PHONY: .deps-go
@@ -100,6 +108,10 @@ endif
 	CGO_ENABLED=0 go build \
 		-mod=mod \
 		-tags='no_mysql no_sqlite3' \
+		-ldflags=" \
+			-X '$(PROJECT_PATH)/internal/config.version=$(VERSION)' \
+			-X '$(PROJECT_PATH)/internal/config.commitHash=$(COMMIT_HASH)' \
+		" \
 		-o $(SERVICE_EXE)$(shell go env GOEXE) $(SERVICE_MAIN)
 
 ################################################################################
