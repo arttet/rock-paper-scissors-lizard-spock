@@ -62,7 +62,7 @@
       }
     },
     "/play": {
-      "get": {
+      "post": {
         "summary": "Play a round against a computer opponent",
         "operationId": "GameService_PlayRoundV1",
         "responses": {
@@ -81,11 +81,12 @@
         },
         "parameters": [
           {
-            "name": "player",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1PlayRoundV1Request"
+            }
           }
         ],
         "tags": [
@@ -156,6 +157,15 @@
           "items": {
             "$ref": "#/definitions/v1Choice"
           }
+        }
+      }
+    },
+    "v1PlayRoundV1Request": {
+      "type": "object",
+      "properties": {
+        "player": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

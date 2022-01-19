@@ -44,7 +44,8 @@ service GameService {
   // Play a round against a computer opponent
   rpc PlayRoundV1(PlayRoundV1Request) returns (PlayRoundV1Response) {
     option (google.api.http) = {
-      get: "/play"
+      post: "/play"
+      body: '*'
     };
   }
 }
