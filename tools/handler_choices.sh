@@ -1,6 +1,6 @@
 #!/bin/bash
 
 curl -v -s -X 'GET' \
-  -H "accept: application/json" \
-  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json; charset=utf-8" \
   http://localhost:8080/choices | jq .

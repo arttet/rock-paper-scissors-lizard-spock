@@ -1,2 +1,1 @@
-# rock-paper-scissors-lizard-spock
-Rock Paper Scissors Lizard Spock
+# Rock Paper Scissors Lizard Spock
