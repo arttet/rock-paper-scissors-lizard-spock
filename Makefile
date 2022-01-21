@@ -43,6 +43,10 @@ cover:
 grpcui:
 	grpcui -plaintext 0.0.0.0:8082
 
+.PHONY: deploy
+deploy:
+	npm run build --prefix website
+
 .PHONY: clean
 clean:
 	rm -rd ./bin/
