@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/arttet/rock-paper-scissors-lizard-spock/internal/app/game-service/api"
+	"github.com/arttet/rock-paper-scissors-lizard-spock/internal/app/game-service/service/random"
+	"github.com/arttet/rock-paper-scissors-lizard-spock/internal/app/game-service/service/rpsls"
 	"github.com/arttet/rock-paper-scissors-lizard-spock/internal/config"
 	"github.com/arttet/rock-paper-scissors-lizard-spock/internal/server"
 	"github.com/arttet/rock-paper-scissors-lizard-spock/internal/telemetry"
@@ -30,6 +32,11 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 
 	pb "github.com/arttet/rock-paper-scissors-lizard-spock/pkg/game-service/v1"
+)
+
+const (
+	n    = 101
+	seed = 0
 )
 
 type Server struct {
@@ -52,7 +59,7 @@ func (s *Server) Start(cfg *config.Config) error {
 	statusAdrr := fmt.Sprintf("%s:%v", cfg.Status.Host, cfg.Status.Port)
 
 	logger := s.logger
-	gatewayServer := newGatewayServer(grpcAddr, gatewayAddr)
+	gatewayServer := newGatewayServer(cfg.REST, grpcAddr, gatewayAddr)
 
 	go func() {
 		logger.Info("gateway server is running", zap.String("address", gatewayAddr))
@@ -106,9 +113,12 @@ func (s *Server) Start(cfg *config.Config) error {
 		)),
 	)
 
+	rg := random.NewRandomGenerator(n, seed, logger)
+	game := rpsls.NewRockPaperScissorsLizardSpockGame(rg, logger)
+
 	pb.RegisterGameServiceServer(
 		grpcServer,
-		api.NewGameServiceServer(logger),
+		api.NewGameServiceServer(game, logger),
 	)
 
 	grpc_prometheus.EnableHandlingTimeHistogram()
