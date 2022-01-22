@@ -1,4 +1,4 @@
-package api_test
+package rpsls_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestAPI(t *testing.T) {
+func TestRpsls(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "API Suite")
+	RunSpecs(t, "RPSLS Suite")
 }

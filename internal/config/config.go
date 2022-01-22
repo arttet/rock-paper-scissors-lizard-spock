@@ -34,8 +34,10 @@ type GRPC struct {
 
 // REST contains all parameters of REST.
 type REST struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	Host           string   `yaml:"host"`
+	Port           int      `yaml:"port"`
+	AllowedOrigins []string `yaml:"allowedOrigins"`
+	AllowedMethods []string `yaml:"allowedMethods"`
 }
 
 // Jaeger contains all parameters tracer information.

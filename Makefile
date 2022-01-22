@@ -11,7 +11,11 @@ PROJECT_PATH=github.com/arttet/rock-paper-scissors-lizard-spock
 all: deps build
 
 .PHONY: deps
-deps: .reqs .deps-go
+deps: .reqs .deps-go gen
+
+.PHONY: gen
+gen:
+	go generate ./...
 
 .PHONY: build
 build: .generate-go .build
@@ -24,6 +28,7 @@ test:
 
 .PHONY: lint
 lint:
+	buf lint
 	golangci-lint run ./...
 
 .PHONY: tidy
@@ -38,6 +43,10 @@ fmt:
 .PHONY: cover
 cover:
 	go tool cover -html cover.out
+
+.PHONY: start
+start:
+	npm start --prefix website
 
 .PHONY: grpcui
 grpcui:
@@ -56,6 +65,7 @@ clean:
 .PHONY: .deps-go
 .deps-go:
 	go mod download
+	go install github.com/golang/mock/mockgen@latest
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	go install github.com/envoyproxy/protoc-gen-validate@latest

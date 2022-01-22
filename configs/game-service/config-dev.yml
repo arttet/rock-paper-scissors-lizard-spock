@@ -13,6 +13,11 @@ grpc:
 rest:
   host: localhost
   port: 8080
+  allowedOrigins:
+    - http://localhost:3000
+  allowedMethods:
+    - GET
+    - POST
 
 logger:
   level: debug
