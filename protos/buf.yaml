@@ -7,6 +7,8 @@ deps:
 lint:
   use:
     - DEFAULT
+  ignore:
+    - rpsls/game_service/v1/game_service.proto
 
   # `".google.protobuf.Empty" is used as the request or response type for multiple RPCs.`
   rpc_allow_google_protobuf_empty_requests: true

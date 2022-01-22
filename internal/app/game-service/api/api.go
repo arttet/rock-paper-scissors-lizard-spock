@@ -2,11 +2,12 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 
-	"github.com/arttet/rock-paper-scissors-lizard-spock/internal/app/game-service/service"
-	"github.com/arttet/rock-paper-scissors-lizard-spock/internal/model"
+	"github.com/arttet/rock-paper-scissors-lizard-spock/internal/app/game-service/service/rpsls"
 
 	"go.uber.org/zap"
+	"google.golang.org/genproto/googleapis/api/httpbody"
 
 	"github.com/golang/protobuf/ptypes/empty"
 
@@ -15,11 +16,17 @@ import (
 
 type api struct {
 	pb.UnimplementedGameServiceServer
+	game   rpsls.RockPaperScissorsLizardSpockGame
 	logger *zap.Logger
 }
 
-func NewGameServiceServer(logger *zap.Logger) pb.GameServiceServer {
+func NewGameServiceServer(
+	game rpsls.RockPaperScissorsLizardSpockGame,
+	logger *zap.Logger,
+) pb.GameServiceServer {
+
 	return &api{
+		game:   game,
 		logger: logger,
 	}
 }
@@ -28,14 +35,15 @@ func (a *api) GetChoicesV1(
 	ctx context.Context,
 	_ *empty.Empty,
 ) (
-	*pb.GetChoicesV1Response,
+	*httpbody.HttpBody,
 	error,
 ) {
 
-	choices := service.GetChoices()
+	data, _ := json.Marshal(a.game.GetChoices()) // nolint:errcheck
 
-	return &pb.GetChoicesV1Response{
-		Choice: model.ToMessages(choices),
+	return &httpbody.HttpBody{
+		ContentType: "application/json",
+		Data:        data,
 	}, nil
 }
 
@@ -47,10 +55,11 @@ func (a *api) GetChoiceV1(
 	error,
 ) {
 
-	choice := service.GetRandomChoice(0)
+	choice := a.game.GetChoice(ctx)
 
 	return &pb.GetChoiceV1Response{
-		Choice: model.ToMessage(choice),
+		Id:   choice.ID,
+		Name: choice.Name,
 	}, nil
 }
 
@@ -62,9 +71,11 @@ func (a *api) PlayRoundV1(
 	error,
 ) {
 
+	result := a.game.PlayRound(ctx, request.Player)
+
 	return &pb.PlayRoundV1Response{
-		Player:   1,
-		Computer: 1,
-		Results:  "win",
+		Player:   result.Player,
+		Computer: result.Computer,
+		Results:  result.Results,
 	}, nil
 }

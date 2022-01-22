@@ -5,7 +5,11 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/arttet/rock-paper-scissors-lizard-spock/internal/config"
+
 	"go.uber.org/zap"
+
+	"github.com/rs/cors"
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
@@ -33,7 +37,7 @@ var (
 
 // Create a client connection to the gRPC Server we just started.
 // This is where the gRPC-Gateway proxies the requests.
-func newGatewayServer(grpcAddr, gatewayAddr string) *http.Server {
+func newGatewayServer(cfg config.REST, grpcAddr, gatewayAddr string) *http.Server {
 	conn, err := grpc.DialContext(
 		context.Background(),
 		grpcAddr,
@@ -53,9 +57,15 @@ func newGatewayServer(grpcAddr, gatewayAddr string) *http.Server {
 		zap.L().Fatal("failed registration handler", zap.Error(err))
 	}
 
+	c := cors.New(cors.Options{
+		AllowedOrigins:   cfg.AllowedOrigins,
+		AllowedMethods:   cfg.AllowedMethods,
+		AllowCredentials: true,
+	})
+
 	gatewayServer := &http.Server{
 		Addr:    gatewayAddr,
-		Handler: tracingWrapper(mux),
+		Handler: tracingWrapper(c.Handler(mux)),
 	}
 
 	return gatewayServer
@@ -66,7 +76,9 @@ func tracingWrapper(h http.Handler) http.Handler {
 		httpTotalRequests.Inc()
 		parentSpanContext, err := opentracing.GlobalTracer().Extract(
 			opentracing.HTTPHeaders,
-			opentracing.HTTPHeadersCarrier(r.Header))
+			opentracing.HTTPHeadersCarrier(r.Header),
+		)
+
 		if err == nil || errors.Is(err, opentracing.ErrSpanContextNotFound) {
 			serverSpan := opentracing.GlobalTracer().StartSpan(
 				"ServeHTTP",
@@ -76,6 +88,7 @@ func tracingWrapper(h http.Handler) http.Handler {
 			r = r.WithContext(opentracing.ContextWithSpan(r.Context(), serverSpan))
 			defer serverSpan.Finish()
 		}
+
 		h.ServeHTTP(w, r)
 	})
 }

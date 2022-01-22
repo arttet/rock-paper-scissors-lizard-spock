@@ -8,6 +8,7 @@ package game_service
 
 import (
 	context "context"
+	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -24,7 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GameServiceClient interface {
 	// Get all the choices that are usable for the UI
-	GetChoicesV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetChoicesV1Response, error)
+	GetChoicesV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*httpbody.HttpBody, error)
 	// Get a randomly generated choice
 	GetChoiceV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetChoiceV1Response, error)
 	// Play a round against a computer opponent
@@ -39,8 +40,8 @@ func NewGameServiceClient(cc grpc.ClientConnInterface) GameServiceClient {
 	return &gameServiceClient{cc}
 }
 
-func (c *gameServiceClient) GetChoicesV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetChoicesV1Response, error) {
-	out := new(GetChoicesV1Response)
+func (c *gameServiceClient) GetChoicesV1(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*httpbody.HttpBody, error) {
+	out := new(httpbody.HttpBody)
 	err := c.cc.Invoke(ctx, "/rpsls.game_service.v1.GameService/GetChoicesV1", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -71,7 +72,7 @@ func (c *gameServiceClient) PlayRoundV1(ctx context.Context, in *PlayRoundV1Requ
 // for forward compatibility
 type GameServiceServer interface {
 	// Get all the choices that are usable for the UI
-	GetChoicesV1(context.Context, *emptypb.Empty) (*GetChoicesV1Response, error)
+	GetChoicesV1(context.Context, *emptypb.Empty) (*httpbody.HttpBody, error)
 	// Get a randomly generated choice
 	GetChoiceV1(context.Context, *emptypb.Empty) (*GetChoiceV1Response, error)
 	// Play a round against a computer opponent
@@ -83,7 +84,7 @@ type GameServiceServer interface {
 type UnimplementedGameServiceServer struct {
 }
 
-func (UnimplementedGameServiceServer) GetChoicesV1(context.Context, *emptypb.Empty) (*GetChoicesV1Response, error) {
+func (UnimplementedGameServiceServer) GetChoicesV1(context.Context, *emptypb.Empty) (*httpbody.HttpBody, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetChoicesV1 not implemented")
 }
 func (UnimplementedGameServiceServer) GetChoiceV1(context.Context, *emptypb.Empty) (*GetChoiceV1Response, error) {

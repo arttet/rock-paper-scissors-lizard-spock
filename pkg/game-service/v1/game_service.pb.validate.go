@@ -35,153 +35,6 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on GetChoicesV1Response with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *GetChoicesV1Response) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on GetChoicesV1Response with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// GetChoicesV1ResponseMultiError, or nil if none found.
-func (m *GetChoicesV1Response) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *GetChoicesV1Response) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if len(m.GetChoice()) != 5 {
-		err := GetChoicesV1ResponseValidationError{
-			field:  "Choice",
-			reason: "value must contain exactly 5 item(s)",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	for idx, item := range m.GetChoice() {
-		_, _ = idx, item
-
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, GetChoicesV1ResponseValidationError{
-						field:  fmt.Sprintf("Choice[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, GetChoicesV1ResponseValidationError{
-						field:  fmt.Sprintf("Choice[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return GetChoicesV1ResponseValidationError{
-					field:  fmt.Sprintf("Choice[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	if len(errors) > 0 {
-		return GetChoicesV1ResponseMultiError(errors)
-	}
-
-	return nil
-}
-
-// GetChoicesV1ResponseMultiError is an error wrapping multiple validation
-// errors returned by GetChoicesV1Response.ValidateAll() if the designated
-// constraints aren't met.
-type GetChoicesV1ResponseMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m GetChoicesV1ResponseMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m GetChoicesV1ResponseMultiError) AllErrors() []error { return m }
-
-// GetChoicesV1ResponseValidationError is the validation error returned by
-// GetChoicesV1Response.Validate if the designated constraints aren't met.
-type GetChoicesV1ResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetChoicesV1ResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetChoicesV1ResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetChoicesV1ResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetChoicesV1ResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetChoicesV1ResponseValidationError) ErrorName() string {
-	return "GetChoicesV1ResponseValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e GetChoicesV1ResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetChoicesV1Response.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetChoicesV1ResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetChoicesV1ResponseValidationError{}
-
 // Validate checks the field values on GetChoiceV1Response with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -204,10 +57,10 @@ func (m *GetChoiceV1Response) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetChoice() == nil {
+	if val := m.GetId(); val < 1 || val > 5 {
 		err := GetChoiceV1ResponseValidationError{
-			field:  "Choice",
-			reason: "value is required",
+			field:  "Id",
+			reason: "value must be inside range [1, 5]",
 		}
 		if !all {
 			return err
@@ -215,33 +68,15 @@ func (m *GetChoiceV1Response) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if all {
-		switch v := interface{}(m.GetChoice()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetChoiceV1ResponseValidationError{
-					field:  "Choice",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, GetChoiceV1ResponseValidationError{
-					field:  "Choice",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
+	if _, ok := _GetChoiceV1Response_Name_InLookup[m.GetName()]; !ok {
+		err := GetChoiceV1ResponseValidationError{
+			field:  "Name",
+			reason: "value must be in list [rock paper scissors lizard spock]",
 		}
-	} else if v, ok := interface{}(m.GetChoice()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GetChoiceV1ResponseValidationError{
-				field:  "Choice",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
+		if !all {
+			return err
 		}
+		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {
@@ -323,6 +158,14 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetChoiceV1ResponseValidationError{}
+
+var _GetChoiceV1Response_Name_InLookup = map[string]struct{}{
+	"rock":     {},
+	"paper":    {},
+	"scissors": {},
+	"lizard":   {},
+	"spock":    {},
+}
 
 // Validate checks the field values on PlayRoundV1Request with the rules
 // defined in the proto definition for this message. If any rules are
@@ -576,132 +419,4 @@ var _PlayRoundV1Response_Results_InLookup = map[string]struct{}{
 	"win":  {},
 	"lose": {},
 	"tie":  {},
-}
-
-// Validate checks the field values on Choice with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *Choice) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Choice with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in ChoiceMultiError, or nil if none found.
-func (m *Choice) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Choice) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if val := m.GetId(); val < 1 || val > 5 {
-		err := ChoiceValidationError{
-			field:  "Id",
-			reason: "value must be inside range [1, 5]",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if _, ok := _Choice_Name_InLookup[m.GetName()]; !ok {
-		err := ChoiceValidationError{
-			field:  "Name",
-			reason: "value must be in list [rock paper scissors lizard spock]",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if len(errors) > 0 {
-		return ChoiceMultiError(errors)
-	}
-
-	return nil
-}
-
-// ChoiceMultiError is an error wrapping multiple validation errors returned by
-// Choice.ValidateAll() if the designated constraints aren't met.
-type ChoiceMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m ChoiceMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m ChoiceMultiError) AllErrors() []error { return m }
-
-// ChoiceValidationError is the validation error returned by Choice.Validate if
-// the designated constraints aren't met.
-type ChoiceValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e ChoiceValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e ChoiceValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e ChoiceValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e ChoiceValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e ChoiceValidationError) ErrorName() string { return "ChoiceValidationError" }
-
-// Error satisfies the builtin error interface
-func (e ChoiceValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sChoice.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = ChoiceValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = ChoiceValidationError{}
-
-var _Choice_Name_InLookup = map[string]struct{}{
-	"rock":     {},
-	"paper":    {},
-	"scissors": {},
-	"lizard":   {},
-	"spock":    {},
 }
