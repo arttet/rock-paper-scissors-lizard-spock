@@ -22,6 +22,18 @@
                 "--cfg",
                 "configs/game-service/config-dev.yml",
             ],
+        },
+        {
+            "name": "Game Service: Delve into Docker",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "localPath": "${workspaceRoot}",
+            "port": 40000,
+            "host": "localhost",
+            "cwd": "${workspaceFolder}",
+            "showLog": true,
+            "trace": "verbose"
         }
     ]
 }
