@@ -16,6 +16,8 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Install Go
         uses: actions/setup-go@v2
         with:
@@ -27,8 +29,14 @@ jobs:
         if: matrix.os == 'macOS-latest'
         shell: bash
         run: brew install protobuf
-      - name: Checkout code
-        uses: actions/checkout@v2
       - name: Build
         shell: bash
         run: make all
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build a Docker image
+        run: make image
