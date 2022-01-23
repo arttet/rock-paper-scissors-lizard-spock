@@ -12,6 +12,10 @@
             },
             "args": [
                 "docker-compose",
+                "-f",
+                "./deploy/docker/docker-compose.yaml",
+                "--project-directory",
+                "./",
                 "build",
             ],
             "group": "build",
@@ -26,6 +30,10 @@
             },
             "args": [
                 "docker-compose",
+                "-f",
+                "./deploy/docker/docker-compose.yaml",
+                "--project-directory",
+                "./",
                 "up",
                 "-d",
             ],
@@ -41,26 +49,14 @@
             },
             "args": [
                 "docker-compose",
+                "-f",
+                "./deploy/docker/docker-compose.yaml",
+                "--project-directory",
+                "./",
                 "down",
             ],
             "group": "build",
             "problemMatcher": []
-        },
-        {
-            "label": "Docker Volumes Remove",
-            "type": "shell",
-            "command": "bash",
-            "windows": {
-                "command": "C:\\Program Files\\Git\\bin\\bash.exe"
-            },
-            "args": [
-                "docker",
-                "volume",
-                "rm",
-                "$(docker volume ls -q)",
-            ],
-            "group": "build",
-            "problemMatcher": []
-        },
+        }
     ]
 }

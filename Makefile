@@ -1,24 +1,31 @@
 GO_VERSION_SHORT:=$(shell echo `go version` | sed -E 's/.* go(.*) .*/\1/g')
 ifneq ("1.17","$(shell printf "$(GO_VERSION_SHORT)\n1.17" | sort -V | head -1)")
-$(error NEED GO VERSION >= 1.17. Found: $(GO_VERSION_SHORT))
+$(warning NEED GO VERSION >= 1.17. Found: $(GO_VERSION_SHORT))
 endif
 
-PROJECT_PATH=github.com/arttet/rock-paper-scissors-lizard-spock
+GITHUB_PATH=github.com/arttet/rock-paper-scissors-lizard-spock
 
 ###############################################################################
 
 .PHONY: all
-all: deps build
+all: .reqs deps gen build
+
+.PHONY: reqs
+reqs: .reqs
 
 .PHONY: deps
-deps: .reqs .deps-go gen
+deps: .deps-go
 
 .PHONY: gen
-gen:
-	go generate ./...
+gen: .generate-go
 
 .PHONY: build
-build: .generate-go .build
+build:  .build
+
+.PHONY: debug
+debug:
+	docker stop game-service || true
+	docker run --rm -d --publish 40000:40000 --publish 8080:8080 --security-opt=seccomp:unconfined --name game-service game-service:debug
 
 .PHONY: test
 test:
@@ -44,21 +51,35 @@ fmt:
 cover:
 	go tool cover -html cover.out
 
+.PHONY: grpcui
+grpcui:
+	grpcui -plaintext localhost:8082
+
+.PHONY: image
+image: .image
+
+.PHONY: debug-image
+debug-image: .debug-image
+
+.PHONY: clean
+clean:
+	rm -rd ./bin/ || true
+	docker container rm -f game-service || true
+	docker volume rm $(docker volume ls-q) || true
+
+################################################################################
+
+.PHONY: install
+install:
+	cd website && npm install && cd ..
+
 .PHONY: start
 start:
 	npm start --prefix website
 
-.PHONY: grpcui
-grpcui:
-	grpcui -plaintext 0.0.0.0:8082
-
 .PHONY: deploy
 deploy:
 	npm run build --prefix website
-
-.PHONY: clean
-clean:
-	rm -rd ./bin/
 
 ################################################################################
 
@@ -95,22 +116,23 @@ endif
 
 ################################################################################
 
-.generate-go: \
-	.generate-game-service
+.generate-go: .generate-mock .generate-game-service
+
+.generate-mock:
+	go generate ./...
 
 .generate-game-service: $(eval SERVICE_NAME := game-service) .generate-template
 
 .generate-template:
 	@ echo $(SERVICE_NAME)
 	@ $(BUF_EXE) generate
-	@ cp -R pkg/$(PROJECT_PATH)/pkg/* pkg/
+	@ cp -R pkg/$(GITHUB_PATH)/pkg/* pkg/
 	@ rm -rf pkg/github.com/
-	@ cd pkg/$(SERVICE_NAME) && ls go.mod || (go mod init $(PROJECT_PATH)/pkg/$(SERVICE_NAME) && go mod tidy)
+	@ cd pkg/$(SERVICE_NAME) && ls go.mod || (go mod init $(GITHUB_PATH)/pkg/$(SERVICE_NAME) && go mod tidy)
 
 ################################################################################
 
-.build: \
-	.build-game-service
+.build: .build-game-service
 
 .build-game-service: \
 	$(eval SERVICE_NAME := game-service) \
@@ -121,11 +143,30 @@ endif
 .build-template:
 	CGO_ENABLED=0 go build \
 		-mod=mod \
-		-tags='no_mysql no_sqlite3' \
 		-ldflags=" \
-			-X '$(PROJECT_PATH)/internal/config.version=$(VERSION)' \
-			-X '$(PROJECT_PATH)/internal/config.commitHash=$(COMMIT_HASH)' \
+			-X '$(GITHUB_PATH)/internal/config.version=$(VERSION)' \
+			-X '$(GITHUB_PATH)/internal/config.commitHash=$(COMMIT_HASH)' \
 		" \
 		-o $(SERVICE_EXE)$(shell go env GOEXE) $(SERVICE_MAIN)
 
 ################################################################################
+
+.image: .image-game-service
+
+.image-game-service: \
+	$(eval SERVICE_NAME := game-service) \
+	.image-template
+
+.image-template:
+	docker build . --file deploy/docker/$(SERVICE_NAME)/Dockerfile --tag $(SERVICE_NAME):dev
+
+################################################################################
+
+.debug-image: .debug-image-game-service
+
+.debug-image-game-service: \
+	$(eval SERVICE_NAME := game-service) \
+	.debug-image-template
+
+.debug-image-template:
+	docker build . --file deploy/docker/$(SERVICE_NAME)/Dockerfile.debug --tag $(SERVICE_NAME):debug

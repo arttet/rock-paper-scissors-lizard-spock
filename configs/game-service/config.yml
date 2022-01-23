@@ -1,0 +1,55 @@
+project:
+  name: Game Service
+  debug: false
+  environment: production
+
+grpc:
+  host: 0.0.0.0
+  port: 8082
+  maxConnectionIdle: 5m
+  timeout: 15s
+  maxConnectionAge: 5m
+
+rest:
+  host: 0.0.0.0
+  port: 8080
+  allowedOrigins:
+    - http://localhost:3000
+    - https://arttet.github.io/rock-paper-scissors-lizard-spock
+  allowedMethods:
+    - GET
+    - POST
+
+logger:
+  level: info
+  encoding: json
+  outputPaths:
+    - stdout
+  errorOutputPaths:
+    - stdout
+  encoderConfig:
+    messageKey: msg
+    levelKey: lvl
+    levelEncoder: lowercase
+    timeKey: time
+    timeEncoder: iso8601
+
+jaeger:
+  host: jaeger
+  port: 6831
+  service: game-service
+
+metrics:
+  host: 0.0.0.0
+  port: 9100
+  path: /metrics
+
+status:
+  host: 0.0.0.0
+  port: 8000
+  livenessPath: /live
+  readinessPath: /ready
+  versionPath: /version
+  loggerPath: /log/level
+  swaggerDir: api/openapi-spec
+  swaggerPath: /swagger/
